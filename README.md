@@ -75,6 +75,16 @@ git --version
 docker --version
 docker compose version
 ```
+If all commands return a version number, you are ready to proceed.
+```bash
+git --version
+  -> git version 2.53.0.windows.1
+docker --version
+  -> Docker version 29.2.0, build 0b9d198
+docker compose version
+  -> Docker Compose version v5.0.2
+```
+
 
 ### 1. Clone the repository
 ```bash
