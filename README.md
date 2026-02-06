@@ -1,0 +1,115 @@
+# 📚 RAG API – FastAPI + Qdrant + Hugging Face
+
+This project is a **Retrieval Augmented Generation (RAG) API** that:
+- Stores text into a **Qdrant vector database**
+- Retrieves the most relevant context
+- Generates answers using **Hugging Face LLM (GLM-4.7)**
+
+All services run using **Docker Compose**.
+
+---
+
+## 🚀 Features
+- REST API with **FastAPI**
+- Endpoints:
+  - `POST /ingest` → store text into vector DB
+  - `POST /ask` → ask questions to the RAG system
+- **SentenceTransformer all-MiniLM-L6-v2** for embeddings
+- **Qdrant** as vector database
+- **Hugging Face Inference API** as LLM generator
+- Automatic text chunking
+- Cosine similarity search
+- Full Docker environment
+
+---
+
+## 🛠️ Technologies
+
+| Component | Technology |
+|----------|------------|
+| API | FastAPI |
+| Embedding | sentence-transformers (all-MiniLM-L6-v2) |
+| Vector DB | Qdrant |
+| LLM | Hugging Face Inference API (zai-org/GLM-4.7) |
+| Container | Docker, Docker Compose |
+
+---
+
+## 📂 Project Structure
+
+```
+rag-project/
+│── app/
+│   ├── main.py   # FastAPI entry point
+│   └── rag.py    # RAG pipeline
+│── .gitignore
+│── Dockerfile
+│── docker-compose.yml
+│── requirements.txt
+└── README.md
+```
+
+---
+
+## ▶️ Running the Project
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/AdityaYulis/rag-project.git
+cd rag-project
+```
+
+### 2. Start with Docker
+```bash
+docker compose up --build
+```
+
+### 3. Access the API
+```
+http://localhost:8000
+```
+
+Swagger UI:
+```
+http://localhost:8000/docs
+```
+
+---
+
+## 🔐 Hugging Face Token Configuration
+
+Add to `docker-compose.yml`:
+
+```yaml
+environment:
+  - HF_API_KEY=hf_xxxxxxxxxxxxx
+```
+
+---
+
+## 📥 Ingest Data
+
+```bash
+curl -X POST http://localhost:8000/ingest      -H "Content-Type: application/json"      -d '{"text":"Your document text here"}'
+```
+
+---
+
+## ❓ Ask a Question
+
+```bash
+curl -X POST http://localhost:8000/ask      -H "Content-Type: application/json"      -d '{"question":"What is this document about?"}'
+```
+
+---
+
+## 🛑 Stop the Containers
+```bash
+docker compose down
+```
+
+---
+
+## 👨‍💻 Author
+**Aditya Yulis Kusdiyanto**  
+Machine Learning & Data Science Enthusiast
