@@ -18,7 +18,6 @@ All services run using **Docker Compose**.
 - **Qdrant** as vector database
 - **Hugging Face Inference API** as LLM generator
 - Automatic text chunking
-- Cosine similarity search
 - Full Docker environment
 
 ---
@@ -51,6 +50,17 @@ rag-project/
 
 ---
 
+## 🔐 Hugging Face Token Configuration
+
+Create a .env fole in the project root and add
+```env
+HF_API_KEY=hf_xxxxxxxxxxxxx
+```
+You can generate your own API with Hugging Face https://huggingface.co/settings/tokens
+---
+
+---
+
 ## ▶️ Running the Project
 
 ### 1. Clone the repository
@@ -73,19 +83,6 @@ Swagger UI:
 ```
 http://localhost:8000/docs
 ```
-
----
-
-## 🔐 Hugging Face Token Configuration
-
-Add to `docker-compose.yml`:
-
-```yaml
-environment:
-  - HF_API_KEY=hf_xxxxxxxxxxxxx
-```
-
----
 
 ## 📥 Ingest Data
 
