@@ -1,9 +1,9 @@
-# 📚 RAG API – FastAPI + Qdrant + Hugging Face
+# 📚 RAG API – FastAPI + Qdrant + Gemini AI
 
 This project is a **Retrieval Augmented Generation (RAG) API** that:
 - Stores text into a **Qdrant vector database**
 - Retrieves the most relevant context
-- Generates answers using **Hugging Face LLM (GLM-4.7)**
+- Generates answers using **Google Gemini AI (LLM)**
 
 All services run using **Docker Compose**.
 
@@ -16,8 +16,9 @@ All services run using **Docker Compose**.
   - `POST /ask` → ask questions to the RAG system
 - **SentenceTransformer all-MiniLM-L6-v2** for embeddings
 - **Qdrant** as vector database
-- **Hugging Face Inference API** as LLM generator
+- **Google Gemini API** as LLM generator
 - Automatic text chunking
+- Context trimming optimized for Gemini free tier
 - Full Docker environment
 
 ---
@@ -29,7 +30,7 @@ All services run using **Docker Compose**.
 | API | FastAPI |
 | Embedding | sentence-transformers (all-MiniLM-L6-v2) |
 | Vector DB | Qdrant |
-| LLM | Hugging Face Inference API (zai-org/GLM-4.7) |
+| LLM | Google Gemini API (gemini-2.5-flash) |
 | Container | Docker, Docker Compose |
 
 ---
@@ -50,19 +51,42 @@ rag-project/
 
 ---
 
-## 🔐 Hugging Face Token Configuration
+## 🔐 Gemini API Key Configuration
 
-Create a `.env` file in the project root and add
-```env
-HF_API_KEY=hf_xxxxxxxxxxxxx
-```
+This project uses **Google Gemini API (NOT Hugging Face)**.
+
+## Step 1 — Get API Key
+
+Go to:
+
+👉 https://aistudio.google.com/app/apikey
+
+Create a new key.
+
 ---
 
-You can generate your own API with Hugging Face https://huggingface.co/settings/tokens
 
-<img width="244" height="213" alt="image" src="https://github.com/user-attachments/assets/aafcd869-037a-46bc-94e3-19bf92aa3388" />
+## Step 2 — Create `.env`
 
-Make sure your permission same as the picture
+Create a `.env` file in the project root:
+```.env
+GEMINI_API_KEY=your_api_key
+```
+
+## 💡 Free Tier Tips
+
+Gemini free billing has request & token limits.  
+This project is already optimized to avoid hitting limits:
+
+- small output tokens (256)
+- limited context size
+- small top-k retrieval
+- trimmed context
+- low temperature
+
+If you hit quota:
+- wait a few minutes
+- or upgrade billing
 
 ---
 
@@ -186,12 +210,18 @@ The system will retrieve the best matching context from the vector database and 
 ### 5. If successfull, you will see :
 ``` json
 {
-  "answer": "Manchester United is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League.",
+  "answer": "Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League.",
   "contexts": [
     "Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League."
   ]
 }
 ```
+
+When the Ask request is successful, the system converts the question into an embedding, searches the Qdrant vector database to find the most relevant document chunks, and sends those contexts to the Gemini LLM. The model then generates a final answer based on the retrieved information and returns it along with the source contexts.
+
+<img width="1919" height="985" alt="image" src="https://github.com/user-attachments/assets/f550032d-52e1-4a2a-804a-1d7e4bf1fd11" />
+
+
 ---
 
 
