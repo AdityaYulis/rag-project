@@ -52,7 +52,7 @@ rag-project/
 
 ## 🔐 Hugging Face Token Configuration
 
-Create a .env fole in the project root and add
+Create a '.env' file in the project root and add
 ```env
 HF_API_KEY=hf_xxxxxxxxxxxxx
 ```
