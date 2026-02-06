@@ -146,7 +146,12 @@ This sends the request to the server and starts the ingestion process.
   "ingested_chunks": 1
 }
 ```
+
 This means the text has been successfully stored in the vector database and is now ready to be queried.
+
+
+<img width="1919" height="983" alt="Screenshot 2026-02-06 130946" src="https://github.com/user-attachments/assets/5e11be20-1818-4b9c-a507-fc605b4b5725" />
+
 ---
 
 ## ❓ Ask a Question
