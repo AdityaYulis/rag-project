@@ -1,259 +1,206 @@
-# 📚 RAG API -- FastAPI + Qdrant + Gemini AI
+# 📚 RAG API – FastAPI + Qdrant + Hugging Face
 
 This project is a **Retrieval Augmented Generation (RAG) API** that:
+- Stores text into a **Qdrant vector database**
+- Retrieves the most relevant context
+- Generates answers using **Hugging Face LLM (GLM-4.7)**
 
--   Stores documents into a **Qdrant vector database**
--   Finds the most relevant chunks using embeddings
--   Generates answers using **Google Gemini AI (LLM)**
+All services run using **Docker Compose**.
 
-All services run using **Docker Compose** so the project is easy to
-start and reproducible on any machine.
-
-------------------------------------------------------------------------
+---
 
 ## 🚀 Features
+- REST API with **FastAPI**
+- Endpoints:
+  - `POST /ingest` → store text into vector DB
+  - `POST /ask` → ask questions to the RAG system
+- **SentenceTransformer all-MiniLM-L6-v2** for embeddings
+- **Qdrant** as vector database
+- **Hugging Face Inference API** as LLM generator
+- Automatic text chunking
+- Full Docker environment
 
--   REST API with **FastAPI**
--   Endpoints:
-    -   `POST /ingest` → store text into vector DB
-    -   `POST /ask` → ask questions to the RAG system
--   **SentenceTransformer all-MiniLM-L6-v2** for embeddings
--   **Qdrant** as vector database
--   **Google Gemini API** as answer generator (LLM)
--   Automatic text chunking
--   Context trimming (optimized for free tier usage)
--   Full Docker environment (one command run)
-
-------------------------------------------------------------------------
+---
 
 ## 🛠️ Technologies
 
-  Component   Technology
-  ----------- ------------------------------------------
-  API         FastAPI
-  Embedding   sentence-transformers (all-MiniLM-L6-v2)
-  Vector DB   Qdrant
-  LLM         Google Gemini API (gemini-flash series)
-  Container   Docker, Docker Compose
+| Component | Technology |
+|----------|------------|
+| API | FastAPI |
+| Embedding | sentence-transformers (all-MiniLM-L6-v2) |
+| Vector DB | Qdrant |
+| LLM | Hugging Face Inference API (zai-org/GLM-4.7) |
+| Container | Docker, Docker Compose |
 
-------------------------------------------------------------------------
+---
 
 ## 📂 Project Structure
 
-    rag-project/
-    │── app/
-    │   ├── main.py   # FastAPI entry point
-    │   └── rag.py    # RAG pipeline (Gemini + Qdrant)
-    │── .gitignore
-    │── Dockerfile
-    │── docker-compose.yml
-    │── requirements.txt
-    └── README.md
+```
+rag-project/
+│── app/
+│   ├── main.py   # FastAPI entry point
+│   └── rag.py    # RAG pipeline
+│── .gitignore
+│── Dockerfile
+│── docker-compose.yml
+│── requirements.txt
+└── README.md
+```
 
-------------------------------------------------------------------------
+---
 
-# 🔐 Gemini API Key Configuration
+## 🔐 Hugging Face Token Configuration
 
-This project uses **Google Gemini AI**, NOT Hugging Face anymore.
+Create a `.env` file in the project root and add
+```env
+HF_API_KEY=hf_xxxxxxxxxxxxx
+```
+---
 
-## Step 1 --- Create API Key
+You can generate your own API with Hugging Face https://huggingface.co/settings/tokens
 
-Open:
+<img width="244" height="213" alt="image" src="https://github.com/user-attachments/assets/aafcd869-037a-46bc-94e3-19bf92aa3388" />
 
-https://aistudio.google.com/app/apikey
+Make sure your permission same as the picture
 
-Generate a new API key.
+---
 
-------------------------------------------------------------------------
+## ▶️ Running the Project
 
-## Step 2 --- Create `.env` file
-
-Create `.env` in the project root:
-
-    GEMINI_API_KEY=your_api_key_here
-
-Docker automatically loads this key because `docker-compose.yml` already
-includes:
-
-    env_file:
-      - .env
-
-------------------------------------------------------------------------
-
-## 💡 Free Tier Optimization
-
-Gemini free billing has request & token limits.
-
-This project is already optimized to avoid quota errors:
-
--   small output tokens (256)
--   limited context size
--   small top-k retrieval
--   trimmed context
--   low temperature
-
-If you hit quota: - wait a few minutes - or upgrade billing
-
-------------------------------------------------------------------------
-
-# ▶️ Running the Project
-
-## 0. Prerequisites Check
-
-Make sure Git and Docker are installed and running:
-
-    git --version
-    docker --version
-    docker compose version
-
-Example:
-
-    git version 2.x.x
-    Docker version 29.x.x
-    Docker Compose version v5.x.x
-
+### 0. Prerequisites Check
+Make sure Git and Docker are installed and active (You can Open **Docker Desktop** and make sure the staus shows **Running**)
+```bash
+git --version
+docker --version
+docker compose version
+```
 If all commands return a version number, you are ready to proceed.
+```bash
+git --version
+  -> git version 2.53.0.windows.1
+docker --version
+  -> Docker version 29.2.0, build 0b9d198
+docker compose version
+  -> Docker Compose version v5.0.2
+```
 
-------------------------------------------------------------------------
 
-## 1. Clone the repository
+### 1. Clone the repository
+```bash
+git clone https://github.com/AdityaYulis/rag-project.git
+cd rag-project
+```
 
-    git clone https://github.com/AdityaYulis/rag-project.git
-    cd rag-project
+### 2. Start with Docker
+```bash
+docker compose up --build
+```
 
-------------------------------------------------------------------------
-
-## 2. Start with Docker
-
-IMPORTANT: always use `--build` when dependencies change
-
-    docker compose up --build
-
-------------------------------------------------------------------------
-
-## 3. Access the API
-
-Main URL:
-
-    http://localhost:8000
+### 3. Access the API
+```
+http://localhost:8000
+```
 
 Swagger UI:
+```
+http://localhost:8000/docs
+```
 
-    http://localhost:8000/docs
+## 📥 Ingest Data
 
-Swagger provides an interactive interface to test all endpoints easily.
+```bash
+curl -X POST http://localhost:8000/ingest      -H "Content-Type: application/json"      -d '{"text":"Your document text here"}'
+```
+---
+**Or**
+You can use Swagger UI to provides an interactive API Interface
 
-------------------------------------------------------------------------
-
-# 📥 Ingest Data
-
-Store text into the vector database.
-
-### Using curl
-
-    curl -X POST http://localhost:8000/ingest \
-    -H "Content-Type: application/json" \
-    -d '{"text":"Your document text here"}'
-
-------------------------------------------------------------------------
-
-### Using Swagger UI
-
-### 1. Open Swagger
-
-    http://localhost:8000/docs
-
-### 2. Click endpoint: POST /ingest
-
-This endpoint sends new data into the RAG system so it can be stored and
-searched later.
+### 1. Open Swagger UI
+In your browser, go to:
+``` bash
+http://localhost:8000/docs
+```
+### 2. Click the endpoint: POST /ingset
+This endpoint is used to send new data into the RAG system so it can be stored and searched later.
 
 ### 3. Click Try it out
+This button allows you to manually test the API by sending a request from the browser.
 
-### 4. Example body
+### 4. In the request body, enter (example):
+``` json
+{
+  "text": "Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League."
+}
+```
+This text will be split into chunks, converted into embeddings, and stored in the vector database.
 
-    {
-      "text": "Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League."
-    }
+**Note** : You can enter data/information about anything, as example i use informaiton about Manchester United
 
-### 5. Click Execute
+### 5. Click **Execute**
+This sends the request to the server and starts the ingestion process.
 
-### 6. Success response
+### 6. If successfull, you will see :
+``` json
+{
+  "ingested_chunks": 1
+}
+```
 
-    {
-      "ingested_chunks": 1
-    }
+This means the text has been successfully stored in the vector database and is now ready to be queried.
 
-This means the text has been split into chunks, embedded, and stored in
-Qdrant.
 
-------------------------------------------------------------------------
+<img width="1919" height="983" alt="Screenshot 2026-02-06 130946" src="https://github.com/user-attachments/assets/5e11be20-1818-4b9c-a507-fc605b4b5725" />
 
-# ❓ Ask a Question
+---
 
-Query the stored knowledge.
+## ❓ Ask a Question
 
-### Using curl
+```bash
+curl -X POST http://localhost:8000/ask      -H "Content-Type: application/json"      -d '{"question":"What is this document about?"}'
+```
 
-    curl -X POST http://localhost:8000/ask \
-    -H "Content-Type: application/json" \
-    -d '{"question":"What is Manchester United?"}'
+---
+**Or**
+You can use Swagger UI to provides an interactive API Interface
 
-------------------------------------------------------------------------
-
-### Using Swagger UI
-
-### 1. Click POST /ask
-
-This endpoint sends a question to the RAG system.
+### 1. Click the endpoint: POST /ask
+This endpoint is used to ask a question to the RAG system based on the data that has been ingested.
 
 ### 2. Click Try it out
+This allows you to send a question directly from Swagger UI.
 
-### 3. Example body
+### 3. In the request body, enter (example) :
+``` json
+{
+  "question": "What is Manchester United?"
+}
+```
+This question will be converted into an embedding and compared with the stored data to find the most relevant context.
 
-    {
-      "question": "What is Manchester United?"
-    }
+**Note** : You can ask about anything, as example i'm asking about Manchester United
 
-### 4. Click Execute
+### 4. Click **Execute**
+The system will retrieve the best matching context from the vector database and send it to the LLM to generate an answer.
 
-### 5. Example response
+### 5. If successfull, you will see :
+``` json
+{
+  "answer": "Manchester United is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League.",
+  "contexts": [
+    "Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League."
+  ]
+}
+```
+---
 
-    {
-      "answer": "Manchester United is a professional football club based in Old Trafford, Greater Manchester, England.",
-      "contexts": [
-        "Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England."
-      ]
-    }
 
-The system: - converts question to embedding - searches Qdrant -
-retrieves relevant chunks - sends context to Gemini - Gemini generates
-final answer
+## 🛑 Stop the Containers
+```bash
+docker compose down
+```
 
-------------------------------------------------------------------------
+---
 
-# ⚙️ How It Works (Architecture)
-
-    User Question
-       ↓
-    SentenceTransformer Embedding
-       ↓
-    Qdrant Vector Search
-       ↓
-    Context Retrieval
-       ↓
-    Gemini AI Generation
-       ↓
-    Answer
-
-------------------------------------------------------------------------
-
-# 🛑 Stop the Containers
-
-    docker compose down
-
-------------------------------------------------------------------------
-
-# 👨‍💻 Author
-
-Aditya Yulis Kusdiyanto
+## 👨‍💻 Author
+**Aditya Yulis Kusdiyanto**  
