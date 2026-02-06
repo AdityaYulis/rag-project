@@ -112,7 +112,41 @@ http://localhost:8000/docs
 ```bash
 curl -X POST http://localhost:8000/ingest      -H "Content-Type: application/json"      -d '{"text":"Your document text here"}'
 ```
+---
+**Or**
+You can use Swagger UI to provides an interactive API Interface
 
+### 1. Open Swagger UI
+In your browser, go to:
+``` bash
+http://localhost:8000/docs
+```
+### 2. Click the endpoint: POST /ingset
+This endpoint is used to send new data into the RAG system so it can be stored and searched later.
+
+### 3. Click Try it out
+This button allows you to manually test the API by sending a request from the browser.
+
+### 4. In the request body, enter (example):
+``` json
+{
+  "text": "Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League."
+}
+```
+This text will be split into chunks, converted into embeddings, and stored in the vector database.
+
+**Note** : You can enter data/information about anything, as example i use informaiton about Manchester United
+
+### 5. Click **Execute**
+This sends the request to the server and starts the ingestion process.
+
+### 6. If successfull, you will see :
+``` json
+{
+  "ingested_chunks": 1
+}
+```
+This means the text has been successfully stored in the vector database and is now ready to be queried.
 ---
 
 ## ❓ Ask a Question
@@ -132,4 +166,3 @@ docker compose down
 
 ## 👨‍💻 Author
 **Aditya Yulis Kusdiyanto**  
-Machine Learning & Data Science Enthusiast
