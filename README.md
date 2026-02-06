@@ -67,6 +67,14 @@ Make sure your permission same as the picture
 
 ## ▶️ Running the Project
 
+### 0. Prerequisites Check
+Make sure Git and Docker are installed and active (You can Open **Docker Desktop** and make sure the staus shows **Running**)
+```bash
+git --version
+docker --version
+docker compose version
+```
+
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/AdityaYulis/rag-project.git
