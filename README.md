@@ -56,8 +56,8 @@ Create a .env fole in the project root and add
 ```env
 HF_API_KEY=hf_xxxxxxxxxxxxx
 ```
-You can generate your own API with Hugging Face https://huggingface.co/settings/tokens
 ---
+You can generate your own API with Hugging Face https://huggingface.co/settings/tokens
 
 ---
 
