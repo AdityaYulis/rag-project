@@ -1,2 +1,3 @@
 .env
 api_key.txt
+app/__pycache__/

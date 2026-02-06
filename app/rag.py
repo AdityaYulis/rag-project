@@ -1,20 +1,44 @@
 import uuid
 import os
 from dotenv import load_dotenv
+from typing import List, Tuple
 
-from huggingface_hub import InferenceClient
+import google.generativeai as genai
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import VectorParams, Distance, PointStruct
-from typing import List, Tuple
 
 load_dotenv()
 
 COLLECTION = "documents"
 
 client = QdrantClient(host="qdrant", port=6333)
+
 embedder = None
-hf = InferenceClient(model="zai-org/GLM-4.7", token=os.getenv("HF_API_KEY"))
+
+def get_embedder():
+    global embedder
+    if embedder is None:
+        print("Loading embedding model...")
+        embedder = SentenceTransformer("all-MiniLM-L6-v2")
+    return embedder
+
+def embed(texts: List[str]) -> List[List[float]]:
+    return get_embedder().encode(texts).tolist()
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+model = genai.GenerativeModel(
+    "gemini-2.5-flash",
+    generation_config={
+        "temperature": 0.2,
+        "max_output_tokens": 256,
+    }
+)
+
+def ask_llm(prompt: str) -> str:
+    response = model.generate_content(prompt)
+    return response.text.strip()
 
 def create_collection():
     client.recreate_collection(
@@ -25,7 +49,7 @@ def create_collection():
         )
     )
 
-def chunk_text(text: str, chunk_size: int = 250, overlap: int = 30) -> List[str]:
+def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 100) -> List[str]:
     chunks = []
     start = 0
     while start < len(text):
@@ -33,13 +57,6 @@ def chunk_text(text: str, chunk_size: int = 250, overlap: int = 30) -> List[str]
         chunks.append(text[start:end])
         start += chunk_size - overlap
     return chunks
-
-def embed(texts: List[str]) -> List[List[float]]:
-    global embedder
-    if embedder is None:
-        print("Loading embedding model...")
-        embedder = SentenceTransformer('all-MiniLM-L6-v2')
-    return embedder.encode(texts).tolist()
 
 def ingest_text(text: str) -> int:
     chunks = chunk_text(text)
@@ -68,35 +85,46 @@ def search(query: str, top_k: int = 2) -> List[str]:
 
     return [point.payload["text"] for point in response.points]
 
+def trim_context(contexts: List[str], max_chars: int = 2500, max_chunks: int = 3) -> List[str]:
+    trimmed = []
+    total = 0
+
+    for ctx in contexts[:max_chunks]:
+        if total + len(ctx) > max_chars:
+            break
+        trimmed.append(ctx)
+        total += len(ctx)
+
+    return trimmed
+
 def generate_answer(question: str, context: List[str]) -> str:
-    context_text = "\n".join(context[:2]) if context else "No context available."
+    safe_context = trim_context(context)
+    context_text = "\n\n".join(safe_context)
 
-    messages = [
-        {
-            "role": "system",
-            "content": "You are a helpful assistant. Answer the question based on the provided context."
-        },
-        {
-            "role": "user",
-            "content": f"Context:\n{context_text}\n\nQuestion: {question}"
-        }
-    ]
+    prompt = f"""
+                You are an AI assistant.
+                Answer ONLY using the context below.
+                If the answer is not found, say: Information not found.
 
-    result = hf.chat_completion(
-        messages=messages,
-        max_tokens=120,
-        temperature=0.2,
-    )
+                CONTEXT:
+                    {context_text}
 
-    return result.choices[0].message.content.strip()
+                QUESTION:
+                    {question}
+
+                ANSWER:
+            """
+    try:
+        return ask_llm(prompt)
+    except Exception as e:
+        return f"LLM Error: {str(e)}"
 
 def ask(question: str) -> Tuple[str, List[str]]:
-    """
-    Search calling + generate_answer safely.
-    Always Returns tuple (answer, contexts)
-    """
-    context = search(question)
-    if not context:
-        context = ["No context available."]
-    answer = generate_answer(question, context)
-    return answer, context
+    contexts = search(question)
+
+    if not contexts:
+        contexts = ["No context available."]
+
+    answer = generate_answer(question, contexts)
+
+    return answer, contexts
