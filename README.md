@@ -161,6 +161,39 @@ curl -X POST http://localhost:8000/ask      -H "Content-Type: application/json" 
 ```
 
 ---
+**Or**
+You can use Swagger UI to provides an interactive API Interface
+
+### 1. Click the endpoint: POST /ask
+This endpoint is used to ask a question to the RAG system based on the data that has been ingested.
+
+### 2. Click Try it out
+This allows you to send a question directly from Swagger UI.
+
+### 3. In the request body, enter (example) :
+``` json
+{
+  "question": "What is Manchester United?"
+}
+```
+This question will be converted into an embedding and compared with the stored data to find the most relevant context.
+
+**Note** : You can ask about anything, as example i'm asking about Manchester United
+
+### 4. Click **Execute**
+The system will retrieve the best matching context from the vector database and send it to the LLM to generate an answer.
+
+### 5. If successfull, you will see :
+``` json
+{
+  "answer": "Manchester United is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League.",
+  "contexts": [
+    "Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England, and plays in the English Premier League."
+  ]
+}
+```
+---
+
 
 ## 🛑 Stop the Containers
 ```bash
