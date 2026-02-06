@@ -57,6 +57,7 @@ Create a `.env` file in the project root and add
 HF_API_KEY=hf_xxxxxxxxxxxxx
 ```
 ---
+
 You can generate your own API with Hugging Face https://huggingface.co/settings/tokens
 <img width="244" height="213" alt="image" src="https://github.com/user-attachments/assets/aafcd869-037a-46bc-94e3-19bf92aa3388" />
 
