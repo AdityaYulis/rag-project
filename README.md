@@ -53,7 +53,7 @@ rag-project/
 
 ## 🔐 Gemini API Key Configuration
 
-This project uses **Google Gemini API (NOT Hugging Face)**.
+This project uses **Google Gemini API**.
 
 ## Step 1 — Get API Key
 
